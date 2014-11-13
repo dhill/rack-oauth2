@@ -53,6 +53,7 @@ module Rack
         #  Using Array#estract_options! for backward compatibility.
         #  Until v1.0.5, the first argument was 'client_auth_method' in scalar.
         options = args.extract_options!
+        Rails.logger.debug "------- options = #{options} -------"
         client_auth_method = args.first || options[:client_auth_method] || :basic
 
         params[:scope] = Array(options[:scope]).join(' ') if options[:scope].present?
