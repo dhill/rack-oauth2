@@ -64,7 +64,7 @@ module Rack
           headers.merge!(
             'Authorization' => "Basic #{cred}"
           )
-        elsif client_auth_method == :signed_jwt
+        elsif client_auth_method == "signed_jwt"
           Rails.logger.debug "------ Signed JWT ------"
 
           params.merge!(
@@ -145,9 +145,9 @@ module Rack
 
       def jwt_token
         byebug
-        # Sign claims with client private key.  The authorization server will 
+        # Sign JWT claims with private key.  The authorization server will 
         # contact client's jwks_uri endpoint to get client's public key to decode the JWT.
-        JWT.encode(jwt_claims, Application.private_key, 'RS256')
+        JWT.encode(jwt_claims, private_key, 'RS256')
       end
 
       CLAIM_EXPIRATION = 60         # Expiration in seconds
