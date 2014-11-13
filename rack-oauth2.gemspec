@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "httpclient", ">= 2.4"
   s.add_runtime_dependency "activesupport", ">= 2.3"
   s.add_runtime_dependency "attr_required", ">= 0.0.5"
+  s.add_runtime_dependency "jwt", ">= 1.0.0"
   s.add_development_dependency "rake", ">= 0.8"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "rspec"

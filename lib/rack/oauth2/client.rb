@@ -46,6 +46,7 @@ module Rack
       end
 
       def access_token!(*args)
+        Rails.logger.debug "------- Entering access_token! -------"
         headers, params = {}, @grant.as_json
 
         # NOTE:
@@ -57,23 +58,38 @@ module Rack
         params[:scope] = Array(options[:scope]).join(' ') if options[:scope].present?
 
         if secret && client_auth_method == :basic
+          Rails.logger.debug "------ Basic Authentication ------"
           cred = ["#{identifier}:#{secret}"].pack('m').tr("\n", '')
           headers.merge!(
             'Authorization' => "Basic #{cred}"
           )
+        elsif client_auth_method == :signed_jwt
+          Rails.logger.debug "------ Signed JWT ------"
+
+          params.merge!(
+            'client_id' => identifier, 
+            'client_assertion_type' => "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            'client_assertion' => jwt_token 
+          )
+          Rails.logger.debug "------ params = #{params.inspect} ------"
         else
+          Rails.logger.debug "------ Client ID / Secret ------"
           params.merge!(
             :client_id => identifier,
             :client_secret => secret
           )
         end
         handle_response do
+          Rails.logger.debug "------ Token endpoint = #{absolute_uri_for(token_endpoint)} ------"
+          Rails.logger.debug "------ headers = #{headers.inspect} ------"
+          Rails.logger.debug "------ params = #{params.inspect} ------"
           Rack::OAuth2.http_client.post(
             absolute_uri_for(token_endpoint),
             Util.compact_hash(params),
             headers
           )
         end
+        Rails.logger.debug "------- Exiting access_token! -------"
       end
 
       private
@@ -124,6 +140,28 @@ module Rack
       def parse_json(raw_json)
         # MultiJson.parse('') returns nil when using MultiJson::Adapters::JsonGem
         MultiJson.load(raw_json).try(:with_indifferent_access) || {}
+      end
+
+      def jwt_token
+        byebug
+        # Sign claims with client private key.  The authorization server will 
+        # contact client's jwks_uri endpoint to get client's public key to decode the JWT.
+        JWT.encode(jwt_claims, Application.private_key, 'RS256')
+      end
+
+      CLAIM_EXPIRATION = 60         # Expiration in seconds
+
+      def jwt_claims
+        now = Time.now.to_i
+
+        {
+          iss: identifier,
+          sub: identifier,
+          aud: absolute_uri_for(token_endpoint),
+          iat: now,
+          exp: now + CLAIM_EXPIRATION,
+          jti: "#{now}/#{SecureRandom.hex(18)}",
+        }
       end
     end
   end
