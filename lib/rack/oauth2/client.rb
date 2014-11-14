@@ -99,7 +99,7 @@ module Rack
         _endpoint_ = Util.parse_uri endpoint
         _endpoint_.scheme ||= self.scheme || 'https'
         _endpoint_.host ||= self.host
-        _endpoint_.port ||= self.port
+        #_endpoint_.port ||= self.port
         raise 'No Host Info' unless _endpoint_.host
         _endpoint_.to_s
       end
