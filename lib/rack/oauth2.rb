@@ -5,6 +5,7 @@ require 'logger'
 require 'active_support/all'
 require 'attr_required'
 require 'attr_optional'
+require 'jwt'
 
 module Rack
   module OAuth2
