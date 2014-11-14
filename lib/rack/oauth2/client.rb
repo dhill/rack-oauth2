@@ -90,7 +90,6 @@ module Rack
             headers
           )
         end
-        Rails.logger.debug "------- Exiting access_token! -------"
       end
 
       private
