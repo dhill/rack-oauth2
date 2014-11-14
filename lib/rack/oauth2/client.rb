@@ -144,7 +144,6 @@ module Rack
       end
 
       def jwt_token
-        byebug
         # Sign JWT claims with private key.  The authorization server will 
         # contact client's jwks_uri endpoint to get client's public key to decode the JWT.
         JWT.encode(jwt_claims, private_key, 'RS256')
