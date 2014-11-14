@@ -3,7 +3,7 @@ module Rack
     class Client
       include AttrRequired, AttrOptional
       attr_required :identifier
-      attr_optional :secret, :redirect_uri, :scheme, :host, :port, :authorization_endpoint, :token_endpoint
+      attr_optional :secret, :redirect_uri, :scheme, :host, :port, :authorization_endpoint, :token_endpoint, :private_key
 
       def initialize(attributes = {})
         (required_attributes + optional_attributes).each do |key|
